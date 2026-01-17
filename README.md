@@ -10,6 +10,7 @@ digital-twin/
 ├── styles.css     # styling for the site
 ├── script.js      # JavaScript logic for the simulator
 ├── README.md      # this file
+└── worker/
 └── assets/
     └── images/
         └── hero.png  # banner image for the hero section
@@ -17,12 +18,12 @@ digital-twin/
 
 ## How to Use
 
-1. Place all files in the root of your GitHub Pages repository (for example, `https://github.com/yourname/digital-twin`).
+1. Place all files in the root of your GitHub Pages repository (for example, `https://github.com/emilio-vasquez/digital-twin`).
 2. Push the repository to the `main` branch.
 3. Enable GitHub Pages under your repository settings:
    - Choose **Deploy from a branch**
    - Set **Branch** to `main` and **Folder** to `/root`
    - Save your changes and wait a minute for the site to build.
-4. Visit the published URL (e.g. `https://yourname.github.io/digital-twin/`) to explore the simulator.
+4. Visit the published URL (`https://emilio-vasquez.github.io/digital-twin/`) to explore the simulator.
 
 The site runs entirely in the browser and does not collect any data. It is intended for educational purposes to encourage discussion around algorithmic profiling, privacy and digital literacy.

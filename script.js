@@ -491,7 +491,7 @@ function schedulePersona(force = false) {
   if (!latestPayload) return;
 
   // Debounce to avoid spamming the backend while sliders move
-  const delay = force ? 0 : 650;
+  const delay = force ? 0 : 1300;
 
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => fetchPersona(latestPayload), delay);
