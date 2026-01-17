@@ -8,11 +8,7 @@
 // === CONFIG ===
 // Set this to your deployed Worker URL, e.g. "https://digital-twin-api.<your>.workers.dev"
 // If left blank, the app will call same-origin "/api/twin" (useful for local testing with a dev server).
-const API_BASE_URL = "";
-
-// Placeholder requested by user (NOT USED by default, for safety):
-// Do NOT put a real key in GitHub Pages.
-const OPENAI_API_KEY_PLACEHOLDER = "THISISMYAPI";
+const API_BASE_URL = "https://YOUR-WORKER-NAME.workers.dev";
 
 const els = {
   form: document.getElementById("twinForm"),
