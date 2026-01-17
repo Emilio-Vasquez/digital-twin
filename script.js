@@ -8,7 +8,7 @@
 // === CONFIG ===
 // Set this to your deployed Worker URL, e.g. "https://digital-twin-api.<your>.workers.dev"
 // If left blank, the app will call same-origin "/api/twin" (useful for local testing with a dev server).
-const API_BASE_URL = "https://YOUR-WORKER-NAME.workers.dev";
+const API_BASE_URL = "https://digital-twin-api.emiliovasquez.workers.dev";
 
 const els = {
   form: document.getElementById("twinForm"),
