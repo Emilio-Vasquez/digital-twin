@@ -19,10 +19,11 @@ const els = {
   locationSharing: document.getElementById("locationSharing"),
   lateNight: document.getElementById("lateNight"),
 
-  presetPrivate: document.getElementById("presetPrivate"),
-  presetSocial: document.getElementById("presetSocial"),
-  presetLate: document.getElementById("presetLate"),
-  reset: document.getElementById("reset"),
+  // Scenario buttons (match IDs in index.html)
+  scenarioPrivate: document.getElementById("scenarioPrivate"),
+  scenarioSocial: document.getElementById("scenarioSocial"),
+  scenarioLate: document.getElementById("scenarioLate"),
+  resetBtn: document.getElementById("resetBtn"),
 
   adProfile: document.getElementById("adProfile"),
   adProfileWhy: document.getElementById("adProfileWhy"),
@@ -555,14 +556,17 @@ function resetAll() {
   schedulePersona(true);
 }
 
-els.presetPrivate.addEventListener("click", () => applyPreset("private"));
-els.presetSocial.addEventListener("click", () => applyPreset("social"));
-els.presetLate.addEventListener("click", () => applyPreset("late"));
-els.reset.addEventListener("click", resetAll);
-els.regenPersona.addEventListener("click", () => schedulePersona(true));
+// Defensive bindings: if an element ID is changed in HTML, we don't want the whole app to crash.
+if (els.scenarioPrivate) els.scenarioPrivate.addEventListener("click", () => applyPreset("private"));
+if (els.scenarioSocial) els.scenarioSocial.addEventListener("click", () => applyPreset("social"));
+if (els.scenarioLate) els.scenarioLate.addEventListener("click", () => applyPreset("late"));
+if (els.resetBtn) els.resetBtn.addEventListener("click", resetAll);
+if (els.regenPersona) els.regenPersona.addEventListener("click", () => schedulePersona(true));
 
-els.form.addEventListener("input", () => updateAll(true));
-els.form.addEventListener("change", () => updateAll(true));
+if (els.form) {
+  els.form.addEventListener("input", () => updateAll(true));
+  els.form.addEventListener("change", () => updateAll(true));
+}
 
 // Init
 prevSnap = null;
