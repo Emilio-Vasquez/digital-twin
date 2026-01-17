@@ -92,7 +92,7 @@ export default {
     // Build a safe, friendly prompt.
     const prompt = buildPrompt(payload);
 
-    const model = "gpt-4o-mini";
+    const model = "gpt-4.1-mini";
 
     try {
       const r = await fetch(OPENAI_RESPONSES_URL, {
