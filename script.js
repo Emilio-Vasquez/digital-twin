@@ -347,7 +347,11 @@ function diffExplain(a, b) {
 let latestPayload = null;
 let latestDerived = null;
 let debounceTimer = null;
-let inflight = 0;
+
+// Request control
+let personaAbort = null;     // AbortController for the current request
+let personaReqSeq = 0;       // monotonically increasing request id
+let personaBusy = false;
 
 function setStatus(text) {
   els.aiStatus.textContent = text;
@@ -355,45 +359,6 @@ function setStatus(text) {
 
 function apiUrl(path) {
   return (API_BASE_URL ? API_BASE_URL.replace(/\/$/, "") : "") + path;
-}
-
-async function fetchPersona(payload) {
-  const reqId = ++inflight;
-  setStatus("Generating…");
-
-  try {
-    const res = await fetch(apiUrl("/api/twin"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`Backend error (${res.status}): ${txt}`);
-    }
-
-    const data = await res.json();
-
-    // Only apply if this is the latest request
-    if (reqId !== inflight) return;
-
-    // Render persona
-    const html = (data.persona_html || "").trim();
-    const text = (data.persona_text || "").trim();
-
-    els.aiPersona.innerHTML = html ? html : `<p>${escapeHtml(text || "(No persona returned.)")}</p>`;
-    setStatus("Updated");
-
-    const now = new Date();
-    els.aiMeta.textContent = `Updated: ${now.toLocaleTimeString()} • Model: ${data.model || "(unknown)"}`;
-  } catch (err) {
-    if (reqId !== inflight) return;
-    setStatus("Offline");
-    els.aiPersona.innerHTML = `<p class="muted"><strong>AI persona unavailable.</strong> Connect the secure backend, then try again.</p>
-      <p class="muted small">${escapeHtml(String(err.message || err))}</p>`;
-    els.aiMeta.textContent = "";
-  }
 }
 
 function escapeHtml(s) {
@@ -405,11 +370,129 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+function setPersonaLoadingUi() {
+  personaBusy = true;
+  if (els.regenPersona) els.regenPersona.disabled = true;
+  setStatus("Generating…");
+}
+
+function setPersonaIdleUi() {
+  personaBusy = false;
+  if (els.regenPersona) els.regenPersona.disabled = false;
+}
+
+function isTransientStatus(code) {
+  return code === 429 || code === 500 || code === 502 || code === 503 || code === 504;
+}
+
+async function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function fetchPersona(payload) {
+  if (!payload) return;
+
+  // "Latest wins" request id
+  const myReqId = ++personaReqSeq;
+
+  // Cancel any in-flight request
+  if (personaAbort) personaAbort.abort();
+  personaAbort = new AbortController();
+
+  setPersonaLoadingUi();
+
+  const url = apiUrl("/api/twin");
+
+  // Retries for transient failures
+  const maxAttempts = 3;
+  const backoff = [250, 800, 1600]; // ms
+
+  try {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // If a newer request started, stop immediately
+      if (myReqId !== personaReqSeq) return;
+
+      let res;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: personaAbort.signal,
+        });
+      } catch (err) {
+        // Abort is expected when user changes inputs quickly
+        if (err && err.name === "AbortError") return;
+
+        // Network-ish error: treat as transient and retry
+        if (attempt < maxAttempts) {
+          setStatus(`Retrying… (${attempt}/${maxAttempts - 1})`);
+          await sleep(backoff[attempt - 1] || 800);
+          continue;
+        }
+        throw err;
+      }
+
+      // If a newer request started, ignore this response
+      if (myReqId !== personaReqSeq) return;
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        const msg = `Backend error (${res.status}): ${txt}`;
+
+        // Transient? retry
+        if (isTransientStatus(res.status) && attempt < maxAttempts) {
+          if (res.status === 429) {
+            setStatus(`Rate limited — retrying… (${attempt}/${maxAttempts - 1})`);
+          } else {
+            setStatus(`Temporary issue — retrying… (${attempt}/${maxAttempts - 1})`);
+          }
+          await sleep(backoff[attempt - 1] || 800);
+          continue;
+        }
+
+        throw new Error(msg);
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      // If a newer request started, ignore
+      if (myReqId !== personaReqSeq) return;
+
+      // Render persona
+      const html = (data.persona_html || "").trim();
+      const text = (data.persona_text || "").trim();
+
+      els.aiPersona.innerHTML = html ? html : `<p>${escapeHtml(text || "(No persona returned.)")}</p>`;
+      setStatus("Updated");
+
+      const now = new Date();
+      els.aiMeta.textContent = `Updated: ${now.toLocaleTimeString()} • Model: ${data.model || "(unknown)"}`;
+
+      return; // success
+    }
+  } catch (err) {
+    // Only show error if still the latest
+    if (myReqId !== personaReqSeq) return;
+
+    setStatus("Offline");
+    els.aiPersona.innerHTML = `
+      <p class="muted"><strong>AI persona unavailable.</strong> Try again in a moment.</p>
+      <p class="muted small">${escapeHtml(String(err?.message || err))}</p>
+    `;
+    els.aiMeta.textContent = "";
+  } finally {
+    // Only re-enable if this request is still "current"
+    if (myReqId === personaReqSeq) setPersonaIdleUi();
+  }
+}
+
 function schedulePersona(force = false) {
   if (!latestPayload) return;
 
-  // Debounce to avoid spamming the backend
-  const delay = force ? 0 : 900;
+  // Debounce to avoid spamming the backend while sliders move
+  const delay = force ? 0 : 650;
+
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => fetchPersona(latestPayload), delay);
 }
