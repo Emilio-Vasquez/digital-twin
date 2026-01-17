@@ -11,8 +11,8 @@ const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 // Lock this down to your GitHub Pages origin(s).
 // Example: ["https://emilio-vasquez.github.io"]
 const ALLOWED_ORIGINS = [
-  "http://localhost:8787",
-  "http://127.0.0.1:8787",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
   // Add your Pages origin here:
   "https://emilio-vasquez.github.io",
 ];
@@ -23,6 +23,7 @@ function corsHeaders(origin) {
     "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
 }
@@ -58,30 +59,50 @@ function stripUnsafeHtml(text) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
+    const url = new URL(request.url);
 
-    // Handle CORS preflight
+    // ===== CORS PREFLIGHT =====
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(origin) });
+      if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+        return new Response("Origin not allowed", { status: 403 });
+      }
+
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders(origin),
+      });
     }
 
-    const url = new URL(request.url);
+    // ===== ROUTING =====
     if (url.pathname !== "/api/twin") {
-      return new Response("Not found", { status: 404, headers: corsHeaders(origin) });
+      return new Response("Not found", {
+        status: 404,
+        headers: corsHeaders(origin),
+      });
     }
 
     if (request.method !== "POST") {
-      return new Response("Method not allowed", { status: 405, headers: corsHeaders(origin) });
+      return new Response("Method not allowed", {
+        status: 405,
+        headers: corsHeaders(origin),
+      });
     }
 
-    if (!env.OPENAI_API_KEY) {
-      return json({ error: "Missing OPENAI_API_KEY in Worker environment." }, origin, 500);
-    }
-
-    // CORS lock
+    // ===== CORS LOCK =====
     if (origin && !ALLOWED_ORIGINS.includes(origin)) {
       return json({ error: "Origin not allowed." }, origin, 403);
     }
 
+    // ===== ENV CHECK =====
+    if (!env.OPENAI_API_KEY) {
+      return json(
+        { error: "Missing OPENAI_API_KEY in Worker environment." },
+        origin,
+        500,
+      );
+    }
+
+    // ===== BODY PARSE =====
     let payload;
     try {
       payload = await request.json();
@@ -89,35 +110,35 @@ export default {
       return json({ error: "Invalid JSON" }, origin, 400);
     }
 
-    // Build a safe, friendly prompt.
+    // ===== PROMPT BUILD =====
     const prompt = buildPrompt(payload);
-
     const model = "gpt-4.1-mini";
 
+    // ===== OPENAI CALL =====
     try {
       const r = await fetch(OPENAI_RESPONSES_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model,
           input: prompt,
-          // Keep it fast and safe
           max_output_tokens: 300,
         }),
       });
 
       if (!r.ok) {
         const txt = await r.text();
-        return json({ error: `OpenAI error (${r.status})`, detail: txt }, origin, 502);
+        return json(
+          { error: `OpenAI error (${r.status})`, detail: txt },
+          origin,
+          502,
+        );
       }
 
       const data = await r.json();
-
-      // Responses API returns output in a structured format.
-      // We'll extract best-effort text.
       const personaText = extractText(data) || "(No text returned)";
 
       return json(
@@ -130,10 +151,15 @@ export default {
         200,
       );
     } catch (e) {
-      return json({ error: "Request failed", detail: String(e?.message || e) }, origin, 502);
+      return json(
+        { error: "Request failed", detail: String(e?.message || e) },
+        origin,
+        502,
+      );
     }
   },
 };
+
 
 function buildPrompt(p) {
   const inputs = p?.inputs || {};
