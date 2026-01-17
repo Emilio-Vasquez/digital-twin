@@ -1,0 +1,6 @@
+name = "digital-twin-proxy"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+# For local dev, you can use a .dev.vars file.
+# For deployment, use: wrangler secret put OPENAI_API_KEY

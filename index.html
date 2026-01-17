@@ -1,286 +1,287 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Digital Twin Already Exists</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital Twin Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="banner" role="note" aria-label="Simulation disclaimer">
+    <span class="banner-dot" aria-hidden="true"></span>
+    <span><strong>This is a simulation.</strong> No real data is collected or stored.</span>
+  </div>
 
-  <body>
-    <!-- Disclaimer banner -->
-    <div class="disclaimer" role="note" aria-label="Simulation disclaimer">
-      <span class="dot" aria-hidden="true"></span>
-      <strong>This is a simulation.</strong> No real data is collected or stored.
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div>
+          <h1>Your Digital Twin Already Exists</h1>
+          <p class="sub">
+            This site turns a few everyday “signals” into a fictional <span class="hl">twin card</span> — a persona a system might generate.
+            Change one input and watch the twin adapt.
+          </p>
+        </div>
+        <div class="hero-chip" aria-label="Workshop mode">
+          <span class="chip-dot" aria-hidden="true"></span>
+          Workshop Demo
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn" type="button" id="presetPrivate">Private Mode</button>
+        <button class="btn" type="button" id="presetSocial">Social & Connected</button>
+        <button class="btn" type="button" id="presetLate">Late-Night Scroll</button>
+        <button class="btn ghost" type="button" id="reset">Reset</button>
+      </div>
+
+      <p class="mini">
+        Tip: pick a preset, then change <strong>one</strong> thing and compare with a friend.
+      </p>
     </div>
+  </header>
 
-    <header class="header">
-      <div class="header-inner">
-        <h1>Your Digital Twin Already Exists</h1>
-        <p>
-          Build a fictional digital twin and see how an algorithm might “guess” profiles, interests,
-          and actions — in a playful, safe way. Try a scenario, then tweak 1–2 settings and compare.
-        </p>
+  <main class="wrap">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>1) Build Your Twin</h2>
+        <p class="muted">These are the only inputs. Everything else is generated.</p>
       </div>
-    </header>
 
-    <main class="container">
-      <div class="grid">
-        <!-- Inputs -->
-        <section class="card" aria-label="Build your digital twin">
-          <div class="card-title">
-            <h2>Build Your Digital Twin</h2>
-            <p class="muted">Adjust inputs — outputs update instantly.</p>
+      <form id="twinForm" class="form" autocomplete="off">
+        <div class="grid2">
+          <div class="field">
+            <label for="ageRange">Age range</label>
+            <select id="ageRange" name="ageRange">
+              <option value="u18">Under 18</option>
+              <option value="18_24" selected>18–24</option>
+              <option value="25_34">25–34</option>
+              <option value="35_44">35–44</option>
+              <option value="45p">45+</option>
+            </select>
           </div>
 
-          <form class="form" id="twinForm">
-            <div class="field">
-              <label for="ageRange">Age range</label>
-              <select id="ageRange" name="ageRange">
-                <option value="u18">Under 18</option>
-                <option value="18_24" selected>18–24</option>
-                <option value="25_34">25–34</option>
-                <option value="35_44">35–44</option>
-                <option value="45p">45+</option>
-              </select>
+          <div class="field">
+            <label for="majorInterest">Major interest</label>
+            <select id="majorInterest" name="majorInterest">
+              <option value="cyber" selected>Cybersecurity</option>
+              <option value="data">Data Science</option>
+              <option value="gaming">Gaming</option>
+              <option value="music">Music</option>
+              <option value="fitness">Fitness</option>
+              <option value="design">Art & Design</option>
+              <option value="business">Business</option>
+              <option value="travel">Travel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="row">
+            <label for="socialUse">Social media use</label>
+            <span class="pill" id="socialValue">5/10</span>
+          </div>
+          <input type="range" id="socialUse" name="socialUse" min="0" max="10" value="5" />
+          <div class="hint"><span>Low</span><span>High</span></div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <div class="row">
+              <label for="locationSharing">Location sharing</label>
+              <label class="switch">
+                <input type="checkbox" id="locationSharing" name="locationSharing" />
+                <span class="slider" aria-hidden="true"></span>
+              </label>
             </div>
-
-            <div class="field">
-              <label for="majorInterest">Major interest</label>
-              <select id="majorInterest" name="majorInterest">
-                <option value="cyber" selected>Cybersecurity</option>
-                <option value="data">Data Science</option>
-                <option value="gaming">Gaming</option>
-                <option value="music">Music</option>
-                <option value="fitness">Fitness</option>
-                <option value="design">Art & Design</option>
-                <option value="business">Business</option>
-                <option value="travel">Travel</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <div class="row">
-                <label for="socialUse">Social media use</label>
-                <span class="pill" id="socialValue">5/10</span>
-              </div>
-              <input type="range" id="socialUse" name="socialUse" min="0" max="10" value="5" />
-              <div class="hint"><span>Low</span><span>High</span></div>
-            </div>
-
-            <div class="field">
-              <div class="row">
-                <label for="locationSharing">Location sharing</label>
-                <label class="switch">
-                  <input type="checkbox" id="locationSharing" name="locationSharing" />
-                  <span class="slider" aria-hidden="true"></span>
-                </label>
-              </div>
-              <p class="muted small">Example: letting apps use location “Always” or “While using”.</p>
-            </div>
-
-            <fieldset class="field">
-              <legend>Password habits</legend>
-              <div class="radio-grid">
-                <label class="radio">
-                  <input type="radio" name="passwordHabits" value="strong" checked />
-                  <span>Strong</span>
-                  <em>Unique passwords + MFA</em>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="passwordHabits" value="okay" />
-                  <span>Okay</span>
-                  <em>Some reuse</em>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="passwordHabits" value="risky" />
-                  <span>Risky</span>
-                  <em>Reuse / shared</em>
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset class="field">
-              <legend>Device usage</legend>
-              <div class="check-grid">
-                <label class="check">
-                  <input type="checkbox" name="devices" value="phone" checked />
-                  <span>Phone</span>
-                </label>
-                <label class="check">
-                  <input type="checkbox" name="devices" value="laptop" checked />
-                  <span>Laptop</span>
-                </label>
-                <label class="check">
-                  <input type="checkbox" name="devices" value="tablet" />
-                  <span>Tablet</span>
-                </label>
-                <label class="check">
-                  <input type="checkbox" name="devices" value="watch" />
-                  <span>Smartwatch</span>
-                </label>
-                <label class="check">
-                  <input type="checkbox" name="devices" value="console" />
-                  <span>Gaming console</span>
-                </label>
-              </div>
-            </fieldset>
-
-            <div class="field">
-              <div class="row">
-                <label for="lateNight">Late-night activity</label>
-                <label class="switch">
-                  <input type="checkbox" id="lateNight" name="lateNight" />
-                  <span class="slider" aria-hidden="true"></span>
-                </label>
-              </div>
-              <p class="muted small">Example: scrolling, shopping, or streaming past midnight.</p>
-            </div>
-          </form>
-        </section>
-
-        <!-- Outputs -->
-        <section class="card" aria-label="Algorithmic output">
-          <div class="card-title">
-            <h2>Algorithmic Output</h2>
-            <p class="muted">Try a scenario → then change 1 thing and see what shifts.</p>
+            <p class="muted small">Adds context (nearby events, local suggestions).</p>
           </div>
 
-          <!-- Scenarios -->
-          <div class="scenarios">
-            <div class="scenarios-head">
-              <span class="label">Try a scenario</span>
-              <span class="muted small">These just set the sliders/toggles for you.</span>
+          <div class="field">
+            <div class="row">
+              <label for="lateNight">Late-night activity</label>
+              <label class="switch">
+                <input type="checkbox" id="lateNight" name="lateNight" />
+                <span class="slider" aria-hidden="true"></span>
+              </label>
             </div>
-
-            <div class="btn-row">
-              <button class="btn" id="scenarioPrivate" type="button">Private Mode</button>
-              <button class="btn" id="scenarioSocial" type="button">Social & Connected</button>
-              <button class="btn" id="scenarioLate" type="button">Late-Night Scroll</button>
-            </div>
+            <p class="muted small">Adds a behavioral pattern signal.</p>
           </div>
+        </div>
 
-          <!-- Goals -->
-          <div class="goals">
-            <div class="goals-head">
-              <span class="label">Mini goals</span>
-              <span class="muted small">Pick one and try to “beat the algorithm.”</span>
-            </div>
-            <div class="goal-list" id="goalList"></div>
+        <fieldset class="field">
+          <legend>Password habits</legend>
+          <div class="radio3">
+            <label class="radio">
+              <input type="radio" name="passwordHabits" value="strong" checked />
+              <span>Strong</span>
+              <em>Unique + MFA</em>
+            </label>
+            <label class="radio">
+              <input type="radio" name="passwordHabits" value="okay" />
+              <span>Okay</span>
+              <em>Some reuse</em>
+            </label>
+            <label class="radio">
+              <input type="radio" name="passwordHabits" value="risky" />
+              <span>Risky</span>
+              <em>Reuse/shared</em>
+            </label>
           </div>
+        </fieldset>
 
-          <div class="outputs">
-            <!-- NEW: Digital Twin Snapshot -->
-            <div class="twin-snap" aria-label="Digital Twin Snapshot">
-              <div class="twin-snap-head">
-                <div>
-                  <h3 class="twin-title">Digital Twin Snapshot</h3>
-                  <p class="muted small">
-                    A fictional “twin card” showing what a system could infer from signals.
-                  </p>
-                </div>
-                <button class="btn primary" id="generateTwin" type="button">
-                  Generate Twin Snapshot
-                </button>
-              </div>
-
-              <div class="twin-meta">
-                <div class="meta-item">
-                  <span class="meta-label">Twin ID</span>
-                  <span class="mono-pill" id="twinId">—</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">Twin Type</span>
-                  <span class="meta-value" id="twinType">—</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">Mirroring Strength</span>
-                  <span class="badge" id="twinStrengthBadge">—</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">Recreation Likelihood</span>
-                  <span class="badge" id="twinLikelihoodBadge">—</span>
-                </div>
-              </div>
-
-              <div class="twin-body">
-                <div class="twin-block">
-                  <span class="block-label">Persona Summary</span>
-                  <p class="block-text" id="twinSummary">
-                    Click “Generate Twin Snapshot” to create a fictional profile card.
-                  </p>
-                  <p class="muted small" id="twinGeneratedMeta"></p>
-                </div>
-
-                <div class="twin-two">
-                  <div class="twin-block">
-                    <span class="block-label">Signal Map (Top signals)</span>
-                    <ul class="signal-list" id="twinSignals"></ul>
-                  </div>
-                  <div class="twin-block">
-                    <span class="block-label">What this twin is good for</span>
-                    <div class="chips" id="twinUseCases"></div>
-                  </div>
-                </div>
-
-                <div class="twin-footnote muted small">
-                  Friendly note: This is not “someone knows you.” It’s about how consistently a system
-                  can guess patterns from signals.
-                </div>
-              </div>
-            </div>
-
-            <!-- “What changed?” explainer -->
-            <div class="explain" id="changeExplain">Make a change to see why outputs shift.</div>
-
-            <div class="output">
-              <div class="output-head">
-                <h3>Ad Profile</h3>
-              </div>
-              <p class="output-value" id="adProfile">—</p>
-              <p class="muted small" id="adProfileWhy"></p>
-            </div>
-
-            <div class="output">
-              <div class="output-head">
-                <h3>Security Risk Score</h3>
-                <span class="badge" id="riskBadge">—</span>
-              </div>
-              <p class="output-value">
-                <span id="riskScore">—</span><span class="unit">/100</span>
-              </p>
-              <p class="muted small" id="riskWhy"></p>
-            </div>
-
-            <div class="output">
-              <div class="output-head">
-                <h3>Targeting Confidence</h3>
-                <span class="badge" id="confidenceBadge">—</span>
-              </div>
-              <p class="output-value">
-                <span id="targetConfidence">—</span><span class="unit">%</span>
-              </p>
-              <p class="muted small" id="confidenceWhy"></p>
-            </div>
-
-            <div class="output">
-              <div class="output-head">
-                <h3>Likely Interests</h3>
-              </div>
-              <div class="chips" id="likelyInterests"></div>
-            </div>
-
-            <div class="output">
-              <div class="output-head">
-                <h3>Recommended Actions</h3>
-              </div>
-              <ul class="actions" id="recommendedActions"></ul>
-            </div>
+        <fieldset class="field">
+          <legend>Device usage</legend>
+          <div class="checks">
+            <label class="check"><input type="checkbox" name="devices" value="phone" checked /> <span>Phone</span></label>
+            <label class="check"><input type="checkbox" name="devices" value="laptop" checked /> <span>Laptop</span></label>
+            <label class="check"><input type="checkbox" name="devices" value="tablet" /> <span>Tablet</span></label>
+            <label class="check"><input type="checkbox" name="devices" value="watch" /> <span>Smartwatch</span></label>
+            <label class="check"><input type="checkbox" name="devices" value="console" /> <span>Gaming console</span></label>
           </div>
-        </section>
+        </fieldset>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>2) Algorithmic Output</h2>
+        <p class="muted">Friendly feedback that updates live.</p>
       </div>
-    </main>
 
-    <script src="script.js"></script>
-  </body>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-top"><span>Ad Profile</span></div>
+          <div class="kpi-val" id="adProfile">—</div>
+          <div class="kpi-sub muted" id="adProfileWhy"></div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-top">
+            <span>Security Risk</span>
+            <span class="badge" id="riskBadge">—</span>
+          </div>
+          <div class="kpi-val"><span id="riskScore">—</span><span class="unit">/100</span></div>
+          <div class="kpi-sub muted" id="riskWhy"></div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-top">
+            <span>Targeting Confidence</span>
+            <span class="badge" id="confidenceBadge">—</span>
+          </div>
+          <div class="kpi-val"><span id="targetConfidence">—</span><span class="unit">%</span></div>
+          <div class="kpi-sub muted" id="confidenceWhy"></div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="box">
+          <div class="box-head">
+            <h3>Likely Interests</h3>
+            <span class="muted small">(generated)</span>
+          </div>
+          <div class="chips" id="likelyInterests"></div>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <h3>Recommended Actions</h3>
+            <span class="muted small">(safe + friendly)</span>
+          </div>
+          <ul class="list" id="recommendedActions"></ul>
+        </div>
+      </div>
+
+      <div class="explain" id="changeExplain">Try a preset, then change one thing and compare.</div>
+
+      <div class="goals">
+        <div class="goals-head">
+          <strong>Mini goals</strong>
+          <span class="muted small">Quick challenges to make it feel like a game.</span>
+        </div>
+        <div class="goal-list" id="goalList"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>3) Twin Card</h2>
+        <p class="muted">AI-generated persona based on the current signals. No scary language.</p>
+      </div>
+
+      <div class="twin">
+        <div class="twin-top">
+          <div class="twin-id">
+            <div class="muted small">Twin ID</div>
+            <div class="mono" id="twinId">—</div>
+          </div>
+
+          <div class="twin-meta">
+            <div class="meta">
+              <div class="muted small">Mirroring Strength</div>
+              <div class="badge" id="twinStrengthBadge">—</div>
+            </div>
+            <div class="meta">
+              <div class="muted small">Recreation Likelihood</div>
+              <div class="badge" id="twinLikelihoodBadge">—</div>
+            </div>
+          </div>
+
+          <div class="twin-cta">
+            <button class="btn primary" type="button" id="regenPersona">Regenerate</button>
+          </div>
+        </div>
+
+        <div class="twin-main">
+          <div class="ai">
+            <div class="ai-head">
+              <h3>AI Persona</h3>
+              <div class="status" id="aiStatus">Ready</div>
+            </div>
+            <div class="ai-body" id="aiPersona">
+              <p class="muted">As you change inputs, this persona updates automatically.</p>
+            </div>
+            <div class="ai-foot muted small" id="aiMeta"></div>
+          </div>
+
+          <div class="side">
+            <div class="side-block">
+              <div class="side-head">
+                <h3>Signal Map</h3>
+                <span class="muted small">Top signals used</span>
+              </div>
+              <ul class="list" id="twinSignals"></ul>
+            </div>
+
+            <div class="side-block">
+              <div class="side-head">
+                <h3>Used For</h3>
+                <span class="muted small">Typical system uses</span>
+              </div>
+              <div class="chips" id="twinUseCases"></div>
+            </div>
+
+            <div class="note muted small">
+              Friendly note: this isn’t “someone knows you.” It’s about how consistently a system can guess patterns from signals.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <details class="debug">
+        <summary>Show request payload (for instructors)</summary>
+        <pre id="payloadPreview"></pre>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-inner muted small">
+      Built for workshops • Client-side simulation + secure backend proxy for AI generation.
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
 </html>
